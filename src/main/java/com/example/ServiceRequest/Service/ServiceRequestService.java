@@ -1,7 +1,9 @@
 package com.example.ServiceRequest.Service;
 
+import com.example.ServiceRequest.Model.ServiceReqRequest;
 import com.example.ServiceRequest.Model.ServiceRequestDTO;
 import com.example.ServiceRequest.Repository.ServiceRequestRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +26,8 @@ public class ServiceRequestService {
         return serviceResponseRepository.findAll();
     }
 
-    public boolean saveServiceRequest(ServiceRequestDTO serviceRequestDTO) {
+    @Transactional
+    public ServiceRequestDTO saveServiceRequest(ServiceRequestDTO serviceRequestDTO) {
         ServiceRequestDTO newServ = ServiceRequestDTO.builder()
                 .buildingCode(serviceRequestDTO.getBuildingCode())
                 .createdBy(serviceRequestDTO.getCreatedBy())
@@ -34,22 +37,22 @@ public class ServiceRequestService {
                 .lastModifiedBy(serviceRequestDTO.getLastModifiedBy())
                 .lastModifiedDate(serviceRequestDTO.getLastModifiedDate())
                 .build();
-         serviceResponseRepository.save(newServ);
-         return true;
+
+         return serviceResponseRepository.save(newServ);
     }
 
     public void deleteServiceRequest(UUID id) {
-        serviceResponseRepository.deleteById(String.valueOf(id));
+        serviceResponseRepository.deleteById(id);
     }
 
     public boolean updateServiceRequest(UUID id, ServiceRequestDTO serviceRequestDTO) {
-        final Optional<ServiceRequestDTO> serviceReq = serviceResponseRepository.findById(String.valueOf(id));
+        final Optional<ServiceRequestDTO> serviceReq = serviceResponseRepository.findById(id);
         if(serviceReq.isEmpty()){
             throw new InputMismatchException("Id not found");
         } else {
             serviceResponseRepository.save(serviceRequestDTO);
+            return true;
         }
-        return  true;
     }
 
 }
